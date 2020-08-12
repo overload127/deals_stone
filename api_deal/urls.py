@@ -9,4 +9,9 @@ urlpatterns = [
         views.TestView.as_view(),
         name='test'
     ),
+    path(
+        'deals/import/csv/',
+        views.DealLoadCSV.as_view(),
+        name='test'
+    ),
 ]

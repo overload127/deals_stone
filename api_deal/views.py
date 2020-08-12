@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
+from rest_framework.parsers import MultiPartParser
 
 
 class TestView(APIView):
@@ -12,4 +13,13 @@ class TestView(APIView):
         return Response(context, status=status.HTTP_200_OK)
 
 
-# class load_file_for_processing
+# class LoadDealsFromFileView(APIView):
+class DealLoadCSV(APIView):
+    """
+    Загрузка сделок из файла
+    """
+    parser_classes = (MultiPartParser,)
+
+    def post(self, request, format='csv'):
+        """ """
+        return Response(status=status.HTTP_200_OK)
