@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# tmp file
+upload_temp/*
+
+# vscode settings
+.vscode
+
+# django migration for bd
+migrations
