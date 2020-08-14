@@ -5,13 +5,13 @@ from . import views
 app_name = 'api_deal'
 urlpatterns = [
     path(
-        'test/',
-        views.TestView.as_view(),
-        name='test'
-    ),
-    path(
         'deals/import/csv/',
         views.DealLoadCSV.as_view(),
-        name='test'
+        name='load'
+    ),
+    path(
+        'deals/top/<int:count>/',
+        views.DealTop.as_view(),
+        name='top'
     ),
 ]

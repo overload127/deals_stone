@@ -136,17 +136,3 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = ['http://' + ip + ':' + IP_PORT for ip in ALLOWED_HOSTS]
-
-
-# set folder for upload temp file
-UPLOAD_TEMP_FILE = BASE_DIR.joinpath('upload_temp')
-if not UPLOAD_TEMP_FILE.exists():
-    raise ValueError(
-        f'Folder is does not exist. Current path is: "{UPLOAD_TEMP_FILE}"'
-    )
-
-if not UPLOAD_TEMP_FILE.is_dir():
-    raise ValueError(
-        'Path points to file. Folder path required.' +
-        f'Current path is: "{UPLOAD_TEMP_FILE}"'
-    )

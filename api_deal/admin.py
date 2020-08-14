@@ -1,32 +1,32 @@
 from django.contrib import admin
-from .models import Gem, Client
+from .models import Gem, Customer, Deal
 
 
-class ClientInline(admin.TabularInline):
-    """Отзывы на странице фильма"""
-    model = Client.gems.through
-    extra = 1
-    readonly_fields = ['__str__']
-
-
-class GemInline(admin.TabularInline):
-    """Отзывы на странице фильма"""
-    model = Gem.owners.through
+class DealInline(admin.TabularInline):
+    """Отображение сделок в виде таблицы"""
+    model = Deal
     extra = 1
     readonly_fields = ['__str__']
 
 
 @admin.register(Gem)
 class GemAdmin(admin.ModelAdmin):
-    """Кадры из фильма"""
+    """Камни"""
     list_display = ['title']
     search_fields = ['title']
-    inlines = [ClientInline]
+    inlines = [DealInline]
 
 
-@admin.register(Client)
-class ClientAdmin(admin.ModelAdmin):
-    """Кадры из фильма"""
-    list_display = ['username']
-    search_fields = ['username']
-    inlines = [GemInline]
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    """Участници сделок"""
+    list_display = ['name']
+    search_fields = ['name']
+    inlines = [DealInline]
+
+
+@admin.register(Deal)
+class DealAdmin(admin.ModelAdmin):
+    """Сделки"""
+    list_display = ['client', 'gem', 'total', 'quantity', 'date']
+    search_fields = ['client__name', 'gem__title']
