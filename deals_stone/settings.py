@@ -26,9 +26,7 @@ SECRET_KEY = '2mybp)=_&1j!@u*c!m%0b^scesg$k$n&x-3b2-o2vyuk9f+8$a'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '127.0.0.1',
-    '192.168.1.103',
-    'localhost',
+    '*',
 ]
 
 IP_PORT = '8000'
@@ -44,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # other apps
-    'corsheaders',
     'rest_framework',
     # my apps
     'api_deal.apps.ApiDealConfig',
@@ -53,7 +50,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -130,9 +126,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
-
-# corsheader settings
-CORS_ORIGIN_ALLOW_ALL = False
-
-CORS_ORIGIN_WHITELIST = ['http://' + ip + ':' + IP_PORT for ip in ALLOWED_HOSTS]
