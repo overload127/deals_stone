@@ -78,6 +78,8 @@ DEBUG = False
 
 2) в файле Dockerfile в последней строке ЛОГИН, ПОЧТУ и ПАРОЛЬ суперпользователя
 
+# Запуск
+
 ```
 sudo docker-compose up
 ```
@@ -102,3 +104,28 @@ sudo docker rm <CONTAINER ID>
 ```
 sudo docker rmi deals_stone_web
 ```
+
+# Процесс работы с сервисом
+
+Отправить свои данные в файле *.csv по адресу в POST запросе:
+http://<IP>:<PORT>/api/v1/api_deal/deals/import/csv/
+
+где:
+  IP - установленный Вами IP в docker-compose.yml
+  PORT Установленный Вами PORT в docker-compose.yml
+
+Варианты ответа:
+  Status: OK - файл был обработан без ошибок;
+  Status: Error, Desc: <Описание ошибки> - в процессе обработки файла произошла ошибка.
+
+
+Получить результат по адресу в GET запросе:
+http://192.168.1.163:8000/api/v1/api_deal/deals/top/5/
+
+где:
+  IP - установленный Вами IP в docker-compose.yml
+  PORT Установленный Вами PORT в docker-compose.yml
+
+Варианты ответа:
+  "response": [] - значит нет ни одного клиента и сделок
+  "response": [...] - набор рассчитаных данных
