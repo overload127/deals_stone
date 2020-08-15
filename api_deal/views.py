@@ -3,12 +3,15 @@ import collections
 from datetime import datetime
 
 from django.db.models import Sum
+from django.core.cache import cache
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 
 from .models import Gem, Customer, Deal, clear_all_table_models
+from .cache import clear_top_cache, add_data_top_to_cache
 
 
 CUSTOMER = 0
@@ -33,6 +36,9 @@ class DealLoadCSV(APIView):
 
         # Отчистка БД
         clear_all_table_models()
+
+        # Установка пустоты в кэшированные данные
+        clear_top_cache()
 
         # Проверка наличия файла
         if 'deals' not in request.FILES:
@@ -175,7 +181,7 @@ def check_cell_correct(row):
         if (row[DEFAULT_FIELDS[DATE]] is None or
            len(row[DEFAULT_FIELDS[DATE]]) < 1 or
            not datetime.strptime(row[DEFAULT_FIELDS[DATE]],
-                             '%Y-%m-%d %H:%M:%S.%f')):
+                                 '%Y-%m-%d %H:%M:%S.%f')):
             return True
 
     except Exception:
@@ -201,6 +207,14 @@ class DealTop(APIView):
             context['response'] = list()
             return Response(context, status=status.HTTP_200_OK)
 
+        # Достаем из кэша инфу
+        key_cache = f'top_users_{count}'
+        list_users = cache.get(key_cache)
+        if list_users:
+            context['response'] = list_users
+            return Response(context, status=status.HTTP_200_OK)
+
+        # Получаем топ пользователей по потраченым деньгам
         customers = list(Customer.objects.annotate(
             total_amount=Sum('deals__total')).order_by(
                 '-total_amount').values(
@@ -238,6 +252,9 @@ class DealTop(APIView):
 
             customer_info['gems'] = clear_gems
             list_users.append(customer_info)
+
+        # Кэшируем новые данные под новый ключ
+        add_data_top_to_cache(key_cache, list_users)
 
         context['response'] = list_users
         return Response(context, status=status.HTTP_200_OK)

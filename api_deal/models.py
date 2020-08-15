@@ -1,4 +1,8 @@
 from django.db import models
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
+
+from .cache import clear_top_cache
 
 
 class Deal(models.Model):
@@ -103,3 +107,36 @@ def clear_all_table_models():
     Gem.clear_db()
     Deal.clear_db()
     Customer.clear_db()
+
+
+@receiver(post_delete, sender=Deal)
+def deal_delete_handler(sender, **kwargs):
+    clear_top_cache()
+
+
+@receiver(post_save, sender=Deal)
+def deal_save_handler(sender, **kwargs):
+    if kwargs['created']:
+        clear_top_cache()
+
+
+@receiver(post_delete, sender=Customer)
+def customer_delete_handler(sender, **kwargs):
+    clear_top_cache()
+
+
+@receiver(post_save, sender=Customer)
+def customer_save_handler(sender, **kwargs):
+    if kwargs['created']:
+        clear_top_cache()
+
+
+@receiver(post_delete, sender=Gem)
+def gem_delete_handler(sender, **kwargs):
+    clear_top_cache()
+
+
+@receiver(post_save, sender=Gem)
+def gem_save_handler(sender, **kwargs):
+    if kwargs['created']:
+        clear_top_cache()
