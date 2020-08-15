@@ -3,7 +3,21 @@ version: '3'
 services:
   web:
     build: .
-    command: gunicorn  deals_stone.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn  deals_stone.wsgi:application --bind 0.0.0.0:8001
     container_name: django-deals_stone
+    expose:
+      - 8001
+    volumes:
+      - static_volume:/usr/src/app/static
+
+  nginx:
+    build: ./nginx
     ports:
-      - "8000:8000"
+      - 8000:80
+    volumes:
+      - static_volume:/usr/src/app/static
+    depends_on:
+      - web
+
+volumes:
+  static_volume:
