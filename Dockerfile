@@ -23,4 +23,4 @@ RUN python manage.py migrate
 RUN mkdir /usr/src/app/static
 RUN python manage.py collectstatic --noinput
 
-RUN python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@mal.ru', >
+RUN python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@mal.ru', '1234');"
