@@ -2,6 +2,7 @@ import csv
 import collections
 from datetime import datetime
 
+from django.db import Error as Error_db
 from django.db.models import Sum
 from django.core.cache import cache
 
@@ -110,7 +111,7 @@ def fill_base(decoded_file_csv):
                     customers[name] = Customer(name=name)
 
             except Exception:
-                # Тут неплохо бы добавить логирование
+                # TODO:Тут неплохо бы добавить логирование
                 find_error = True
                 errors.append(str(numline))
 
@@ -140,7 +141,7 @@ def fill_base(decoded_file_csv):
                 date=datetime.strptime(row[DATE], '%Y-%m-%d %H:%M:%S.%f')
             ))
         except Exception:
-            # Тут неплохо бы добавить логирование
+            # TODO:Тут неплохо бы добавить логирование
             find_error = True
             errors.append(str(numline))
 
@@ -215,18 +216,29 @@ class DealTop(APIView):
             return Response(context, status=status.HTTP_200_OK)
 
         # Получаем топ пользователей по потраченым деньгам
-        customers = list(Customer.objects.annotate(
-            total_amount=Sum('deals__total')).order_by(
-                '-total_amount').values(
-                    'id', 'name', 'total_amount')[:count])
+        try:
+            customers = list(Customer.objects.annotate(
+                total_amount=Sum('deals__total')).order_by(
+                    '-total_amount').values(
+                        'id', 'name', 'total_amount')[:count])
+        except Error_db:
+            # Произошла ошибка. TODO:Тут не помешали бы логи
+            context['response'] = []
+            return Response(context, status=status.HTTP_200_OK)
 
         id_customers = list()
         for customer in customers:
             id_customers.append(customer['id'])
 
-        gems = list(Deal.objects.filter(
-            client__id__in=id_customers).values(
-                'client__id', 'gem__title').distinct())
+        # Получаем все камни связанные с нашими топ покупателями
+        try:
+            gems = list(Deal.objects.filter(
+                client__id__in=id_customers).values(
+                    'client__id', 'gem__title').distinct())
+        except Error_db:
+            # Произошла ошибка. TODO:Тут не помешали бы логи
+            context['response'] = []
+            return Response(context, status=status.HTTP_200_OK)
 
         all_gems = list()
         gem_of_customer = dict()
