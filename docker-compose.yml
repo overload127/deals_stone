@@ -26,10 +26,8 @@ services:
   db:
     image: postgres:12.0-alpine
 
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=4321
-      - POSTGRES_DB=def_123
+    env_file:
+      - ./.env.dev
 
     ports:
       - "192.168.1.163:5444:5432"
@@ -38,16 +36,5 @@ services:
       - ./postgres_data:/var/lib/postgresql/data/
 
 volumes:
-  static_volume:
-
-
-  db:
-    image: postgres:12.0-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=hello_django
-      - POSTGRES_PASSWORD=hello_django
-      - POSTGRES_DB=hello_django_dev
-volumes:
   postgres_data:
+  static_volume:
