@@ -67,50 +67,114 @@ cd deals_stone/
 echo gunicorn == 20.0.4 >> requirements.txt
 ```
 
-Создаем файл виртуальных переменных окружения продакшена:
+Все настройки находятся в файле docker-compose.yml
+Открываем файл:
 ```
-nano .env.prod
+nano docker-compose.yml
 ```
 
-Скопируйте и замените на свои параметры следующие строки:
+Описание строк настройки:
 ```
-DJANGO_DEBUG=0
+DJANGO_DEBUG=<включает и отключает режим отладки>
 DGANGO_SECRET_KEY=<Ваш секретный ключ/любая строка>
 DJANGO_ALLOWED_HOSTS=<ip адреса через пробел. '*' - любой адрес>
-DJANGO_IP_PORT=8000
-SQL_ENGINE=django.db.backends.postgresql
+DJANGO_IP_PORT=<порт веб приложения>
+SQL_ENGINE=<Тип базы данных>
 SQL_DATABASE=<Название БД в системе управления БД>
 SQL_USER=<Логин админа для БД>
 SQL_PASSWORD=<Пароль админа для БД>
-SQL_HOST=db
-SQL_PORT=5444
+SQL_HOST=<ip БД><Лучше всего использовать 'db' - оно указывает на контейнер с БД>
+SQL_PORT=<port БД><Просто ставьте внутренний ip контейнера БД '5432'>
+```
 
+Второй блок настроек (Находится ниже)
+```
 POSTGRES_USER=<как в SQL_USER>
 POSTGRES_PASSWORD=<как в SQL_PASSWORD>
 POSTGRES_DB=<как в SQL_DATABASE>
 ```
 
-В файле Dockerfile (находится в папке deals_stone) в последней строке нужно сменить ЛОГИН, ПОЧТУ и ПАРОЛЬ суперпользователя web-приложения
+Пример простых настроек (Никогда их не используйте):
+```
+- DJANGO_DEBUG=0
+- DGANGO_SECRET_KEY=my_secret_key_322_3_xya
+- DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1] *
+- DJANGO_IP_PORT=8000
+- SQL_ENGINE=django.db.backends.postgresql
+- SQL_DATABASE=django_prod
+- SQL_USER=admin
+- SQL_PASSWORD=admin_pgs
+- SQL_HOST=db
+- SQL_PORT=5432
+```
 
-В файле "docker-compose.yml" заменить строку (2 раза встречается. Оба раза заменить):
+Второй блок настроек (Находится ниже)
 ```
-- ./.env.dev
-```
-
-На строку:
-```
-- ./.env.prod
+- POSTGRES_USER=admin
+- POSTGRES_PASSWORD=admin_pgs
+- POSTGRES_DB=django_prod
 ```
 
 ========= 3 =========
+# Первый запуск
+
+Собираем все 3 контейнера и запускаем 3 образа в фоновом режиме
+```
+sudo docker-compose -f docker-compose.yml up -d --build
+```
+
+Подготавливаем все необходимые миграции и выполняем их
+```
+sudo docker-compose -f docker-compose.yml exec web python manage.py makemigrations api_deal --noinput
+```
+
+```
+sudo docker-compose -f docker-compose.yml exec web python manage.py makemigrations --noinput
+```
+
+```
+sudo docker-compose -f docker-compose.yml exec web python manage.py migrate --noinput
+```
+
+Собираем все статические файлы
+```
+sudo docker-compose -f docker-compose.yml exec web python manage.py collectstatic --no-input --clear
+```
+
+Создаем суперпользователя
+```
+sudo docker-compose -f docker-compose.yml exec web python manage.py createsuperuser 
+```
+
+Выключаем контейнеры
+```
+sudo docker-compose -f docker-compose.yml down
+```
+
+========= 4 =========
 # Запуск
 
+Запуск с выводом на консоль
 ```
 sudo docker-compose up --build
 ```
 
+Запуск в фоновом режиме
+```
+sudo docker-compose -f docker-compose.yml up -d --build
+```
 
-========= 4 =========
+========= 5 =========
+# Остановка
+Если контейнеры запущены с выводом на консоль, то просто ctrl+c
+
+Если работают в фоновом режиме, то вводим команду:
+
+```
+sudo docker-compose -f docker-compose.yml down
+```
+
+========= 6 =========
 # Процесс работы с сервисом
 
 Отправить свои данные в файле *.csv по адресу в POST запросе:
@@ -136,7 +200,7 @@ http://<_IP>:<_PORT>/api/v1/api_deal/deals/top/5/
   "response": [] - значит нет ни одного клиента и сделок
   "response": [...] - набор рассчитаных данных
 
-========= 5 =========
+========= 7 =========
 # Для удаления контейнера и образов:
 
 
