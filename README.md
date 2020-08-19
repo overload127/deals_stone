@@ -83,20 +83,30 @@ SQL_DATABASE=<Название БД в системе управления БД>
 SQL_USER=<Логин админа для БД>
 SQL_PASSWORD=<Пароль админа для БД>
 SQL_HOST=db
-SQL_PORT=<порт для БД>
+SQL_PORT=5444
 
-POSTGRES_USER
-POSTGRES_PASSWORD
-POSTGRES_DB
+POSTGRES_USER=<как в SQL_USER>
+POSTGRES_PASSWORD=<как в SQL_PASSWORD>
+POSTGRES_DB=<как в SQL_DATABASE>
 ```
 
-2) в файле Dockerfile (находится в папке deals_stone) в последней строке нужно сменить ЛОГИН, ПОЧТУ и ПАРОЛЬ суперпользователя web-приложения
+В файле Dockerfile (находится в папке deals_stone) в последней строке нужно сменить ЛОГИН, ПОЧТУ и ПАРОЛЬ суперпользователя web-приложения
+
+В файле "docker-compose.yml" заменить строку (2 раза встречается. Оба раза заменить):
+```
+- ./.env.dev
+```
+
+На строку:
+```
+- ./.env.prod
+```
 
 ========= 3 =========
 # Запуск
 
 ```
-sudo docker-compose up
+sudo docker-compose up --build
 ```
 
 

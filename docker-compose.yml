@@ -9,8 +9,18 @@ services:
       - 8001
     volumes:
       - static_volume:/usr/src/app/static
-    env_file:
-      - ./.env.dev
+    environment:
+      - DJANGO_DEBUG=0
+      - DGANGO_SECRET_KEY=
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1] *
+      - DJANGO_IP_PORT=8000
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=django_prod
+      - SQL_USER=
+      - SQL_PASSWORD=
+      - SQL_HOST=db
+      - SQL_PORT=5432
+
     depends_on:
       - db
 
@@ -26,11 +36,13 @@ services:
   db:
     image: postgres:12.0-alpine
 
-    env_file:
-      - ./.env.dev
+    environment:
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
+      - POSTGRES_DB=django_prod
 
     ports:
-      - "192.168.1.163:5444:5432"
+      - 5444:5432
 
     volumes:
       - ./postgres_data:/var/lib/postgresql/data/
