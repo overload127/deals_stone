@@ -38,7 +38,7 @@ class DealLoadCSV(APIView):
         # Отчистка БД
         clear_all_table_models()
 
-        # Установка пустоты в кэшированные данные
+        # Удаляем данные из кэша
         clear_top_cache()
 
         # Проверка наличия файла

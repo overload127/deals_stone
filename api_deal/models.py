@@ -86,7 +86,7 @@ class Gem(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Кмень'
+        verbose_name = 'Камень'
         verbose_name_plural = 'Камни'
 
     def __str__(self):
@@ -111,32 +111,50 @@ def clear_all_table_models():
 
 @receiver(post_delete, sender=Deal)
 def deal_delete_handler(sender, **kwargs):
+    """
+    Чистим кеш, если были внесены изменения в БД
+    """
     clear_top_cache()
 
 
 @receiver(post_save, sender=Deal)
 def deal_save_handler(sender, **kwargs):
+    """
+    Чистим кеш, если были внесены изменения в БД
+    """
     if kwargs['created']:
         clear_top_cache()
 
 
 @receiver(post_delete, sender=Customer)
 def customer_delete_handler(sender, **kwargs):
+    """
+    Чистим кеш, если были внесены изменения в БД
+    """
     clear_top_cache()
 
 
 @receiver(post_save, sender=Customer)
 def customer_save_handler(sender, **kwargs):
+    """
+    Чистим кеш, если были внесены изменения в БД
+    """
     if kwargs['created']:
         clear_top_cache()
 
 
 @receiver(post_delete, sender=Gem)
 def gem_delete_handler(sender, **kwargs):
+    """
+    Чистим кеш, если были внесены изменения в БД
+    """
     clear_top_cache()
 
 
 @receiver(post_save, sender=Gem)
 def gem_save_handler(sender, **kwargs):
+    """
+    Чистим кеш, если были внесены изменения в БД
+    """
     if kwargs['created']:
         clear_top_cache()

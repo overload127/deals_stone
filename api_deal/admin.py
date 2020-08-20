@@ -19,7 +19,7 @@ class GemAdmin(admin.ModelAdmin):
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    """Участници сделок"""
+    """Участники сделок"""
     list_display = ['name']
     search_fields = ['name']
     inlines = [DealInline]
