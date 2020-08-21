@@ -1,3 +1,5 @@
+import decimal
+
 from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
@@ -21,9 +23,11 @@ class Deal(models.Model):
         verbose_name='Камни',
         related_name='deals'
     )
-    total = models.PositiveIntegerField(
+    total = models.DecimalField(
+        max_digits=19,
+        decimal_places=2,
         verbose_name='Сумма',
-        default=0
+        default=decimal.Decimal(0.00)
     )
     quantity = models.PositiveIntegerField(
         verbose_name='Количество камней',
@@ -38,10 +42,10 @@ class Deal(models.Model):
         verbose_name_plural = 'Сделки клиентов'
 
     def __str__(self):
-        return f'{self.client} {self.gem} ${self.total}'
+        return f'{self.client} {self.gem} ${decimal.Decimal(self.total)}'
 
     def __repr__(self):
-        return f'<{self.client} {self.gem} ${self.total}>'
+        return f'<{self.client} {self.gem} ${decimal.Decimal(self.total)}>'
 
     @classmethod
     def clear_db(cls):

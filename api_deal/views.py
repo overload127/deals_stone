@@ -1,4 +1,5 @@
 import csv
+import decimal
 import collections
 from datetime import datetime
 
@@ -120,8 +121,14 @@ def fill_base(decoded_file_csv):
         deskription = ' '.join(errors)
         return f'line [{deskription}] is bad'
 
-    Gem.objects.bulk_create(gems.values())
-    Customer.objects.bulk_create(customers.values())
+    try:
+        Gem.objects.bulk_create(gems.values())
+        Customer.objects.bulk_create(customers.values())
+    except Exception as err:
+        # TODO:Тут неплохо бы добавить логирование
+        clear_all_table_models()
+        deskription = err
+        return f'line [{deskription}] is bad'
 
     for gem in Gem.objects.all().values('title', 'id'):
         gems[gem['title']] = gem['id']
@@ -136,7 +143,7 @@ def fill_base(decoded_file_csv):
             deals.append(Deal(
                 client_id=customers[row[CUSTOMER]],
                 gem_id=gems[row[GEM]],
-                total=row[TOTAL],
+                total=decimal.Decimal(row[TOTAL]),
                 quantity=row[QUANTITY],
                 date=datetime.strptime(row[DATE], '%Y-%m-%d %H:%M:%S.%f')
             ))
@@ -151,7 +158,13 @@ def fill_base(decoded_file_csv):
         deskription = ' '.join(errors)
         return f'line [{deskription}] is bad'
 
-    Deal.objects.bulk_create(deals)
+    try:
+        Deal.objects.bulk_create(deals)
+    except Exception as err:
+        # TODO:Тут неплохо бы добавить логирование
+        clear_all_table_models()
+        deskription = err
+        return f'{deskription}'
 
     return None
 
@@ -171,7 +184,7 @@ def check_cell_correct(row):
 
         if (row[DEFAULT_FIELDS[TOTAL]] is None or
            len(row[DEFAULT_FIELDS[TOTAL]]) < 1 or
-           int(row[DEFAULT_FIELDS[TOTAL]]) < 0):
+           decimal.Decimal(row[DEFAULT_FIELDS[TOTAL]]) < 0):
             return True
 
         if (row[DEFAULT_FIELDS[QUANTITY]] is None or
