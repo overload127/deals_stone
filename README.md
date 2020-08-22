@@ -53,6 +53,7 @@ cd python_project_1/
 ```
 sudo apt install git
 ```
+
 ```
 git clone https://github.com/overload127/deals_stone.git
 ```

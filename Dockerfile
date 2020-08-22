@@ -22,7 +22,7 @@ RUN \
 COPY . .
 
 # Create dir static
-RUN mkdir /usr/src/app/static
+# RUN mkdir /usr/src/app/static
 
 # Create dir logging
-RUN mkdir /usr/src/app/logging
+# RUN mkdir /usr/src/app/logging
