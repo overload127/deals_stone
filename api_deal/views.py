@@ -29,11 +29,11 @@ DEFAULT_FIELDS = ['customer', 'item', 'total', 'quantity', 'date']
 logger = logging.getLogger(__name__)
 
 # lvl prioritet
-logger.critical('start sait')
-logger.error('start sait')
-logger.warning('start sait')
-logger.info('start sait')
-logger.debug('start sait')
+# logger.critical('start sait')
+# logger.error('start sait')
+# logger.warning('start sait')
+# logger.info('start sait')
+# logger.debug('start sait')
 
 
 class DealLoadCSV(APIView):
@@ -59,6 +59,7 @@ class DealLoadCSV(APIView):
             deskription = 'does not file transfer in field "deals"'
             context['status'] = f'Error, Desc: {deskription} - ' \
                 'в процессе обработки файла произошла ошибка.'
+            logger.warning(deskription)
 
             return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
@@ -74,6 +75,7 @@ class DealLoadCSV(APIView):
                 deskription = f'does not exist field "{field}" in file'
                 context['status'] = f'Error, Desc: {deskription} - ' \
                     'в процессе обработки файла произошла ошибка.'
+                logger.warning(deskription)
 
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
@@ -85,10 +87,12 @@ class DealLoadCSV(APIView):
             deskription = bad_status
             context['status'] = f'Error, Desc: {deskription} - ' \
                 'в процессе обработки файла произошла ошибка.'
+            logger.warning(deskription)
 
             return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
         context['status'] = 'OK - файл был обработан без ошибок'
+        logger.info(context['status'])
         return Response(context, status=status.HTTP_200_OK)
 
 
@@ -124,23 +128,22 @@ def fill_base(decoded_file_csv):
                     customers[name] = Customer(name=name)
 
             except Exception:
-                # TODO:Тут неплохо бы добавить логирование
                 find_error = True
                 errors.append(str(numline))
 
     # Есть ошибки? - Выходим
     if errors:
-        deskription = ' '.join(errors)
-        return f'line [{deskription}] is bad'
+        errors_msg = ' '.join(errors)
+        deskription = f'line [{errors_msg}] is bad'
+        return deskription
 
     try:
         Gem.objects.bulk_create(gems.values())
         Customer.objects.bulk_create(customers.values())
     except Exception as err:
-        # TODO:Тут неплохо бы добавить логирование
         clear_all_table_models()
         deskription = err
-        return f'line [{deskription}] is bad'
+        return deskription
 
     for gem in Gem.objects.all().values('title', 'id'):
         gems[gem['title']] = gem['id']
@@ -160,23 +163,22 @@ def fill_base(decoded_file_csv):
                 date=datetime.strptime(row[DATE], '%Y-%m-%d %H:%M:%S.%f')
             ))
         except Exception:
-            # TODO:Тут неплохо бы добавить логирование
             find_error = True
             errors.append(str(numline))
 
     # Есть ошибки? - отчистка БД и выходим
     if errors:
         clear_all_table_models()
-        deskription = ' '.join(errors)
-        return f'line [{deskription}] is bad'
+        errors_msg = ' '.join(errors)
+        deskription = f'line [{errors_msg}] is bad'
+        return deskription
 
     try:
         Deal.objects.bulk_create(deals)
     except Exception as err:
-        # TODO:Тут неплохо бы добавить логирование
         clear_all_table_models()
         deskription = err
-        return f'{deskription}'
+        return deskription
 
     return None
 
@@ -231,6 +233,7 @@ class DealTop(APIView):
         # Проверка корректности запроса
         if count <= 0:
             context['response'] = list()
+            logger.info('Send top{count} users')
             return Response(context, status=status.HTTP_200_OK)
 
         # Достаем из кэша инфу
@@ -238,6 +241,7 @@ class DealTop(APIView):
         list_users = cache.get(key_cache)
         if list_users:
             context['response'] = list_users
+            logger.info('Send top{count} users')
             return Response(context, status=status.HTTP_200_OK)
 
         # Получаем топ пользователей по потраченым деньгам
@@ -246,9 +250,9 @@ class DealTop(APIView):
                 total_amount=Sum('deals__total')).order_by(
                     '-total_amount').values(
                         'id', 'name', 'total_amount')[:count])
-        except Error_db:
-            # Произошла ошибка. TODO:Тут не помешали бы логи
+        except Error_db as err:
             context['response'] = []
+            logger.warning(err)
             return Response(context, status=status.HTTP_200_OK)
 
         id_customers = list()
@@ -260,9 +264,9 @@ class DealTop(APIView):
             gems = list(Deal.objects.filter(
                 client__id__in=id_customers).values(
                     'client__id', 'gem__title').distinct())
-        except Error_db:
-            # Произошла ошибка. TODO:Тут не помешали бы логи
+        except Error_db as err:
             context['response'] = []
+            logger.warning(err)
             return Response(context, status=status.HTTP_200_OK)
 
         all_gems = list()
@@ -294,4 +298,5 @@ class DealTop(APIView):
         add_data_top_to_cache(key_cache, list_users)
 
         context['response'] = list_users
+        logger.info('Send top{count} users')
         return Response(context, status=status.HTTP_200_OK)
