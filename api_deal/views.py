@@ -1,4 +1,5 @@
 import csv
+import logging
 import decimal
 import collections
 from datetime import datetime
@@ -22,6 +23,17 @@ TOTAL = 2
 QUANTITY = 3
 DATE = 4
 DEFAULT_FIELDS = ['customer', 'item', 'total', 'quantity', 'date']
+
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
+# lvl prioritet
+logger.critical('start sait')
+logger.error('start sait')
+logger.warning('start sait')
+logger.info('start sait')
+logger.debug('start sait')
 
 
 class DealLoadCSV(APIView):

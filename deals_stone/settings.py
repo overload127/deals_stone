@@ -139,3 +139,46 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR.joinpath('static/')
+
+
+# logging setting
+LOGGING_ROOT = BASE_DIR.joinpath('logging')
+
+if not LOGGING_ROOT.exists() or LOGGING_ROOT.is_file():
+    raise(f'Bad folder for logs: LOGGING_ROOT={LOGGING_ROOT}')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(name)-12s %(levelname)-8s %(message)s',
+            'datefmt': '%d/%m/%Y %H:%M:%S'
+        },
+        'file': {
+            'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+            'datefmt': '%d/%m/%Y %H:%M:%S'
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'formatter': 'file',
+            'when': 'D',
+            'interval': 1,
+            'backupCount': 0,
+            'filename': LOGGING_ROOT.joinpath('api_deal.log'),
+        }
+    },
+    'loggers': {
+        '': {
+            'level': 'INFO',
+            'handlers': ['console', 'file']
+        }
+    }
+}

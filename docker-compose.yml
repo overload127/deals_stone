@@ -9,6 +9,7 @@ services:
       - 8001
     volumes:
       - static_volume:/usr/src/app/static
+      - ./logging:/usr/src/app/logging
     environment:
       - DJANGO_DEBUG=0
       - DGANGO_SECRET_KEY=my_secret_key_322_3_xya
